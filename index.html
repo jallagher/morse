@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+    <body>
+        <center>
+            <h2>The Smoke Alarm</h2>
+        <img id="alarm" src="off.jpeg" />
+    </body>
+</html>
+<script>
+    const UNIT = 0.25; // Duration of one 'dit' in seconds
+
+    const MORSE = {
+        "0": "-----",
+        "1": ".----",
+        "2": "..---",
+        "3": "...--",
+        "4": "....-",
+        "5": ".....",
+        "6": "-....",
+        "7": "--...",
+        "8": "---..",
+        "9": "----.",
+        "a": ".-",
+        "b": "-...",
+        "c": "-.-.",
+        "d": "-..",
+        "e": ".",
+        "f": "..-.",
+        "g": "--.",
+        "h": "....",
+        "i": "..",
+        "j": ".---",
+        "k": "-.-",
+        "l": ".-..",
+        "m": "--",
+        "n": "-.",
+        "o": "---",
+        "p": ".--.",
+        "q": "--.-",
+        "r": ".-.",
+        "s": "...",
+        "t": "-",
+        "u": "..-",
+        "v": "...-",
+        "w": ".--",
+        "x": "-..-",
+        "y": "-.--",
+        "z": "--..",
+        ".": ".-.-.-",
+        ",": "--..--",
+        "?": "..--..",
+        "!": "-.-.--",
+        "-": "-....-",
+        "/": "-..-.",
+        "@": ".--.-.",
+        "(": "-.--.",
+        ")": "-.--.-"
+    }
+
+    function sleep(units) {
+        return new Promise(resolve => setTimeout(resolve, UNIT * 1000 * units));
+    }
+
+    function alarmOn() {
+        document.getElementById("alarm").src = "on.jpeg";
+    }
+
+    function alarmOff() {
+        document.getElementById("alarm").src = "off.jpeg";
+    }
+
+    async function dit() {
+        alarmOn();
+        await sleep(1);
+        alarmOff();
+    }
+
+    async function dah() {
+        alarmOn();
+        await sleep(3);
+        alarmOff();
+    }
+
+    async function flashChar(c) {
+        const INTRA_CHAR = 1;
+        const INTER_CHAR = 3;
+        const SPACE = 7;
+
+        if (c == " ") {
+            alarmOff(); // Should be off anyway.
+            await sleep(SPACE - INTER_CHAR - INTRA_CHAR);
+        } else {
+            let code = MORSE[c];
+            for (let i = 0; i < code.length; i++) {
+                if (code[i] == ".") {
+                    await dit();
+                } else {
+                    await dah();
+                }
+                await sleep(INTRA_CHAR);
+            }
+        }
+        await sleep(INTER_CHAR - INTRA_CHAR);
+    }
+
+    async function flash(message) {
+        while (true) {
+            for (let i = 0; i < message.length; i++) {
+                console.log(message[i]);
+                await flashChar(message[i]);
+            }
+            await flashChar(" ");
+            await flashChar(" ");
+        }
+    }
+
+    flash("jack is a genius");
+</script>
